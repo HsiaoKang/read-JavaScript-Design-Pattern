@@ -123,5 +123,123 @@ f(); // 输 出： 5
 
 高阶函数可以实现AOP、柯里化（currying）uncurrying、函数节流（resize等事件、上传进度扫描频率）、惰性加载。
 
+## 第四章 单例模式
 
+### 定义
+
+保证一个类只有一个实例，并提供一个它的全局访问点。
+
+### 实现
+
+#### 简单的实例
+
+```javascript
+    var Singleton = function (name) {
+        this.name = name
+        this.instance = null
+    }
+
+    Singleton.prototype.getName = function () {
+        console.log(this.name)
+    }
+
+    Singleton.getInstance = function (name) {
+        // 如果存在则采用，否则创建
+        if (!this.name) {
+            console.log('create')
+            // 这里的this指向是Singleton函数
+            this.instance = new Singleton(name)
+        }
+        console.log(this.instance)
+        return this.instance
+    }
+
+    var a = Singleton.getInstance('sven1')
+    var b = Singleton.getInstance('sven2')
+
+    console.log(a === b)        // true 这里打印时undefined，当然是true咯
+
+    // or
+    // Singleton.getInstance = (function () {
+    //     var instance = null
+    //     return function (name) {
+    //         if (!this.name) {
+    //             return new Singleton(name)
+    //         }
+    //         return instance
+    //     }
+    // }())
+```
+
+#### 透明的单例模式
+
+```
+ var CreateDiv = (function () {
+            var instance;
+            var CreateDiv = function (html) {
+                if (instance) {
+                    return instance;
+                }
+                this.html = html;
+                this.init();
+                return instance = this;
+            };
+            CreateDiv.prototype.init = function () {
+                var div = document.createElement('div');
+                div.innerHTML = this.html;
+                document.body.appendChild(div);
+            };
+            return CreateDiv;
+        })();
+        var a = new CreateDiv('sven1');
+        var b = new CreateDiv('sven2');
+        alert(a === b); // true
+```
+
+#### 通过代理实现单例模式
+
+```javascript
+  var CreateDiv = function (html) {
+            this.html = html;
+            this.init();
+        };
+        CreateDiv.prototype.init = function () {
+            var div = document.createElement('div');
+            div.innerHTML = this.html;
+            document.body.appendChild(div);
+        };
+
+        // 单例处理提出来
+        var ProxySingletonCreateDiv = (function () {
+            var instance;
+            return function (html) {
+                if (!instance) {
+                    instance = new CreateDiv(html);
+                }
+                return instance;
+            }
+        })();
+
+        var a = new ProxySingletonCreateDiv('sven1');
+        var b = new ProxySingletonCreateDiv('sven2');
+        alert(a === b);
+```
+
+
+
+在Javascript中其实没有必要非得用“类”的概念来实现单例模式，只需要将实例保存到变量中即可（这时候涉及到一个全局变量问题，同样可以通过命名空间或者闭包来解决）。
+
+#### 惰性单例
+
+有对应操作的时候再来创建。
+
+#### 小结
+
+单例模式，在只需要一个实例的情况下，避免重复创建。
+
+实例保存在合理的作用域内，这里可以用闭包来实现，并涉及到单一职责原则。
+
+可以在需要用到的时候才去创建这个实例，避免浪费。
+
+## 第五章 策略模式
 
