@@ -282,3 +282,62 @@ console.log( calculateBonus( 'A', 10000 ) ); // 输 出： 30000
 ### 小结
 
 策略模式是结合了多种设计原则来实现的，在需要多种方案分别处理事务时可以考虑使用；在JavaScript中，策略模式可以通过将对象的值作为函数的方式来实现，不必再通过定义类的方式。
+
+## 第六章 代理模式
+
+### 定义
+
+为一个对象提供一个代用品或占位符，以便控制对它的访问。
+
+**保护代理**：过滤掉不满足要求的请求，控制权限。
+
+**虚拟代理**：在合适的时间才执行请求。
+
+主要讲虚拟代理，场景有图片预加载（先放loading，内容处理完成后替换掉）
+
+### 意义
+
+代理的意义在于帮助实现了面向对象设计中——单一职责原则，而坚持单一职责的原则可以让代码拆分的更加细粒度，更有利于维护，这个其实是相当于用代码量换来**稳定性**和**可维护性**
+
+### 实现
+
+代理和本体需要实现同一个`接口`,保证代理的兼容性，在JavaScript（或者其他动态类型语言）中则可以选择是做检查还是依靠程序员的自觉性。
+
+```javascript
+var myImage = (function () {
+    var imgNode = document.createElement('img')
+    document.body.appendChild(imgNode)
+
+    return {
+        setSrc(src) {
+            imgNode.src = src
+        }
+    }
+})()
+
+
+// 引入代理
+var proxyImage = (function(){
+    var img = new Image
+    img.onLoad = function(){
+        myImage.setSrc(this.src)
+    }
+    return {
+        setSrc(src){
+            myImage.setSrc('file:// /C:/Users/svenzeng/Desktop/loading.gif')
+            img.src = src
+        }
+    }
+})()
+
+myImage.setSrc('http://imgcache.qq.com/music/photo/k/000GGDys0yA0Nk.jpg');
+
+```
+
+### 场景
+
+图片预加载、合并重复请求、缓存代理（缓存代理可以为一些开销大的运算结果提供暂时的存储，在下次运算时，如果传递进来的参数跟之前一致，则可以直接返回前面存储的运算结果。）
+
+还有些其他的：防火墙代理，远程代理，保护代理，智能引用代理，写时复制代理。
+
+代理可以在实际需要的时候再去编写，JavaScript中最多的是虚拟代理和缓存代理。
