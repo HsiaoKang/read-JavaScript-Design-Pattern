@@ -535,3 +535,65 @@ myImage.setSrc('http://imgcache.qq.com/music/photo/k/000GGDys0yA0Nk.jpg');
 ### 小结
 
 发布——订阅模式在时间和对象之间做了解耦，可以帮助实现其他模式，如中介者模式。但是创建订阅者会消耗内存，即使没有发生消息，但是订阅者一直存在。过度使用的话也会弱化对象间的联系，不容易定位bug
+
+## 第九章 命令模式
+
+### 用途
+
+可以用来消除信息发送者和信息接收者之间的耦合关系。这中间交给命令列表，命令模式支持延时、撤销、排队等操作。
+
+### 设计
+
+JavaScript中函数作为一等公民，可以直接将函数作为命令来传递。这些命令存放在一个列表。撤销和重做功能可以基于这个列表来实现。宏命令则是提供了一个触发器，来批量执行任务。
+
+智能命令和傻瓜命令的区别就是智能命令不再需要通过执行器来执行命令，实现方式上和策略模式一样。
+
+Javascript中可以用高阶函数的方式来实现命令模式，所以这个模式在Javascript中是隐形的。
+
+### 示例
+
+```javascript
+var Ryu = {
+    attack: function () {
+        console.log('攻 击');
+    },
+    defense: function () {
+        console.log('防 御');
+    },
+    jump: function () {
+        console.log('跳 跃');
+    },
+    crouch: function () {
+        console.log('蹲 下');
+    }
+}; var makeCommand = function (receiver, state) {
+    // 创 建 命 令 
+    return function () {
+        receiver[state]();
+    }
+};
+var commands = {
+    "119": "jump", // W 
+    "115": "crouch", // S
+    "97": "defense", // A
+    "100": "attack" // D
+};
+var commandStack = []; // 保 存 命 令 的 堆 栈 
+document.onkeypress = function (ev) {
+    var keyCode = ev.keyCode,
+        command = makeCommand(Ryu, commands[keyCode]);
+    if (command) {
+        command(); // 执 行 命 令 
+        commandStack.push(command); // 将 刚 刚 执 行 过 的 命 令 保 存 进 堆 栈 
+    }
+};
+document.getElementById('replay').onclick = function () {
+    // 点 击 播 放 录 像 
+    var command;
+    while (command = commandStack.shift()) {
+        // 从 堆 栈 里 依 次 取 出 命 令 并 执 行 
+        command();
+    }
+};
+```
+
