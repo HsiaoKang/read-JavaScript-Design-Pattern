@@ -214,5 +214,4 @@ event.remove = function (key, fn) {
                 };
             }(); return Event;
         })();
-
     })()
