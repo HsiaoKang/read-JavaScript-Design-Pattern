@@ -715,3 +715,68 @@ folder.scan();
 
 需要统一对待树中的所有对象。
 
+## 第十一章 模板方法模式
+
+多个子类具有相同的行为模式时，将这些行为抽象出来成为模板那，细节和不同在各自相同的行为下实现。
+
+### 举例
+
+如同茶和咖啡，都是烧水、倒杯子里、加材料的过程。
+
+### 场景
+
+搭建框架（vue模板，React组件）
+
+### 示例
+
+```javascript
+var Beverage = function (param) {
+    var boilWater = function () {
+        console.log('把 水 煮 沸');
+    };
+    var brew = param.brew || function () {
+        throw new Error('必 须 传 递 brew 方 法');
+    };
+    var pourInCup = param.pourInCup || function () {
+        throw new Error('必 须 传 递 pourInCup 方 法');
+    };
+    var addCondiments = param.addCondiments || function () {
+        throw new Error('必 须 传 递 addCondiments 方 法');
+    };
+    var F = function () { };
+    F.prototype.init = function () {
+        boilWater();
+        brew();
+        pourInCup();
+        addCondiments();
+    }
+    return F;
+};
+var Coffee = Beverage({
+    brew: function () {
+        console.log('用 沸 水 冲 泡 咖 啡');
+    },
+    pourInCup: function () {
+        console.log('把 咖 啡 倒 进 杯 子');
+    },
+    addCondiments: function () {
+        console.log('加 糖 和 牛 奶');
+    }
+});
+var Tea = Beverage({
+    brew: function () {
+        console.log('用 沸 水 浸 泡 茶 叶');
+    },
+    pourInCup: function () {
+        console.log('把 茶 倒 进 杯 子');
+    },
+    addCondiments: function () {
+        console.log('加 柠 檬');
+    }
+});
+var coffee = new Coffee();
+coffee.init();
+var tea = new Tea();
+tea.init();	
+```
+

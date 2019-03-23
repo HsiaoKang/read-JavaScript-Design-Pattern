@@ -73,8 +73,12 @@ folder.scan();
     };
     // file
     var File = function (name) { this.name = name; this.parent = null; };
-    File.prototype.add = function () { throw new Error('不 能 添 加 在 文 件 下 面'); };
-    File.prototype.scan = function () { console.log('开 始 扫 描 文 件: ' + this.name); };
+    File.prototype.add = function () {
+        throw new Error('不 能 添 加 在 文 件 下 面');
+    };
+    File.prototype.scan = function () {
+        console.log('开 始 扫 描 文 件: ' + this.name);
+    };
     File.prototype.remove = function () {
         if (!this.parent) {
             // 根 节 点 或 者 树 外 的 游 离 节 点
