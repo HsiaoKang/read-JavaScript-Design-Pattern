@@ -780,3 +780,89 @@ var tea = new Tea();
 tea.init();	
 ```
 
+## 第十二章 享元模式
+
+将对象的属性划分为内部状态和外部状态，目标是减少共享对象的数量，即减少了系统中的对象数量。这种昂模式只需在特定的环境中将外部状态传入内部组成完整的对象。
+
+所以，关键就在于如何区分内部状态和外部状态，
+
+### 示例
+
+文件上传
+
+```javascript
+// 只保存type
+        var Upload = function (uploadType) {
+            this.uploadType = uploadType
+        }
+        Upload.prototype.delFile = function (id) {
+            uploadManager.setExternalState(id, this)
+
+            if (this.fileSize < 3000) {
+                return this.dom.parentNode.removeChild(this.dom)
+            }
+
+            if (window.confirm('确定要删除该文件吗？' + this.fileName)) {
+                return this.dom.parentNode.removeChild(this.dom)
+            }
+        }
+
+        // 工厂进行对象实例化（单例）
+        var UploadFactory = (function () {
+            var createdFilWeightObjes = {}
+
+            return {
+                create: function (uploadType) {
+                    if (createdFilWeightObjes[uplioadType]) {
+                        return createdFilWeightObjes[uploadType]
+                    }
+                    return createdFilWeightObjes[uploadType] = new Upload(uploadType)
+                }
+            }
+        })()
+
+        // 管理器封装外部状态
+        var uploadManager = (function () {
+            var uploadDatabase = {}
+
+            return {
+                add: function (id, uploadType, fileName, fileSize) {
+                    var flyWeightObj = UploadFactory.create(uploadType)
+
+                    var dom = document.createElement('div')
+                    dom.innerHTML =
+                        '<span>文件名称：' + fileName + ',文件大小：' + fileSize + '</span>' +
+                        '<button class="delFile">删除</button>'
+
+                    dom.querySelector('. delFile').onclick = function () { flyWeightObj.delFile(id); }
+                    document.body.appendChild(dom);
+
+                    uploadDatabase[id] = { fileName: fileName, fileSize: fileSize, dom: dom };
+                    return flyWeightObj;
+                },
+                setExternalState: function (id, flyWeightObj) {
+                    var uploadData = uploadDatabase[id];
+                    for (var i in uploadData) {
+                        flyWeightObj[i] = uploadData[i];
+                    }
+                }
+
+            }
+        })()
+
+        var id = 0; window.startUpload = function (uploadType, files) {
+            for (var i = 0, file; file = files[i++];) {
+                var uploadObj = uploadManager.add(++id, uploadType, file.fileName, file.fileSize);
+            }
+        };
+```
+
+
+
+### 对象池
+
+建立一个对象池，如果没有，则创建并保存在对象池中，使用的时候从对象池中取，使用之后对对象进行回收，放回对象池。
+
+### 解决的问题
+
+主要是为了解决系统中存在大量相似对象的问题，提高性能。
